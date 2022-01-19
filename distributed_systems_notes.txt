@@ -1,0 +1,56 @@
+###############
+# Introduction
+###############
+- where can we find distributed systems
+watch a movie on demand
+shop online
+order a ride share service through our mobile
+search for something online
+
+- companies running highly scalable distributed systems to:
+handle millions of users
+Petabytes of data
+provide consistent user experience
+
+- Cloud (AWS, Azure, GCP, etc) is a distributed system designed for companies and software developers
+
+
+# Evolution of a small software startup company
+- example:
+John creates an awesome website + mobile app to purchase computer products and share the reviews with friends / users
+He creates that website in his laptop and mobile with a webserver computer as the backend webserver / disk
+As the user base grows, the computer can't handle and performance degrades
+John upgrades his computer - vertical scaling
+However, more users still hits the limit of the computer
+Also single point of failure - if computer goes down - everything stops
+High latency for users who are far away in other countries / continents
+Security and Privacy may also be breached easily
+
+- Solution: Distributed System
+A Distributed System is a system of several processes, running on different computers,
+ communicating with each other through the network,
+ and are sharing a state
+ or are working together to achieve a common goal
+
+- What is a Process
+Any application / jar running in computers memory
+
+# Inter-process communication (same machine)
+- processes communicating to each other via:
+File System (hard disk)
+Memory
+
+- not a distributed system
+
+# Decoupling of processes
+- run each process on different computers
+- horizontal scaling - adding more machines
+- network communication between machines
+- sharing state and working toward a common goal => no common goal - not a distributed system
+
+
+
+
+
+
+
