@@ -21,7 +21,7 @@ John creates an awesome website + mobile app to purchase computer products and s
 He creates that website in his laptop and mobile with a webserver computer as the backend webserver / disk
 As the user base grows, the computer can't handle and performance degrades
 John upgrades his computer - vertical scaling
-However, more users still hits the limit of the computer
+However, more users still hit the limits of the computer
 Also single point of failure - if computer goes down - everything stops
 High latency for users who are far away in other countries / continents
 Security and Privacy may also be breached easily
@@ -33,7 +33,7 @@ A Distributed System is a system of several processes, running on different comp
  or are working together to achieve a common goal
 
 - What is a Process
-Any application / jar running in computers memory
+Any application / jar running in computer's memory
 
 # Inter-process communication (same machine)
 - processes communicating to each other via:
@@ -48,6 +48,84 @@ Memory
 - network communication between machines
 - sharing state and working toward a common goal => no common goal - not a distributed system
 
+
+##########################################################
+# Cluster Coordination Service and Distributed Algorithms
+##########################################################
+
+## Introduction to Cluster Coordination & Theory of Leader Election
+
+# Terminology
+- Node
+a process running on a dedicated machine
+can communicate with each other on a network
+
+- Cluster
+collection of computer/nodes connected to each other
+the nodes in a cluster are working on the same task and typically are running the same code
+
+
+# Design our first disributed algorithm
+- how to hand a task to a Cluster
+- how to break the work among nodes
+
+# Attempt 1 - manual distribution
+- define each node a separate task manually
+- but thousands of tasks received per second - impossible to manually distribute it
+
+# Attempt 2 - manually elect a leader
+- a leader node decides and distributes (programatically) tasks amongs nodes
+- but single point of failure if leader node is down
+
+# Attempt 3 - automatic leader election
+- algorithm to elect leader and monitor the health
+- failure detection -> re-election of new leader
+- joining of old leader after recovery
+
+# challenges of leader/master -> workers architecture
+- automatic and system leader election is not a trivial task to solve, even among people
+- arriving to an agreement on a leader in a large cluster of nodes is even harder
+- by default, each node knows only about itself - thus, service registry and discovery is required
+- failure detection mechanism is necessary to trigger automatic leader re-election in a cluster
+
+# Master-Workers coordinaton solution
+- implement distributed algorithms for consensus and failover from scratch
+- Apache Zookeeper - high performance distributed system coordination service
+
+
+## Apache Zookeeper
+- a high performance coordination service designed specifically for distributed systems
+- popular technology used by many companies and projects (Kafka, Hadoop, HBase, etc)
+- provides an abstraction layer for higher level distributed algorithms
+
+# what makes Zookeeper a good solution?
+- is a distributed system itself that provides us high availability and reliability
+- typically runs in a cluster of an odd number of nodes, higher than 3
+- uses redundancy to allow failures and stay functional
+
+# Zookeeper properties
+- Zookeeper's abstraction and data model is very much similar to a file system - root node and directories / subdirectories / files
+- each node in a Zookeeper is called Znodes
+- Znodes:
+hybrid between a file and a directory
+Znodes can store any data inside - like a file
+Znodes can have children Znodes - like a directory
+
+- two types of Znodes:
+persistent: persists between sessions
+ephermal: is deleted when the session ends
+
+
+## Leader election algorithn
+- each Znode sends its election candidate to Zookeeper
+- elected based on lower number priority or some other algorithm
+
+## resources
+https://blog.twitter.com/engineering/en_us/topics/infrastructure/2018/zookeeper-at-twitter
+https://zookeeper.apache.org/doc/r3.7.0/index.html
+
+
+## Zookeeper Server and Client - Download and setup
 
 
 
