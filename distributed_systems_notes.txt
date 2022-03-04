@@ -126,9 +126,23 @@ https://zookeeper.apache.org/doc/r3.7.0/index.html
 
 
 ## Zookeeper Server and Client - Download and setup
+- Zookeeper configuration and startup
+- Zookeeper command line client
+- development done locally on a single computer but deploy to production cluster
 
+- download:
+https://zookeeper.apache.org/releases.html
+https://www.apache.org/dyn/closer.lua/zookeeper/zookeeper-3.7.0/apache-zookeeper-3.7.0.tar.gz
 
+- configuration:
+rename conf/zoo.cfg
+change dataDir
 
+- run:
+start server
+./bin/zkServer.sh start
+
+start client
 
 
 
