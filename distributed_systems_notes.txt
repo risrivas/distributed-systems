@@ -132,17 +132,49 @@ https://zookeeper.apache.org/doc/r3.7.0/index.html
 
 - download:
 https://zookeeper.apache.org/releases.html
-https://www.apache.org/dyn/closer.lua/zookeeper/zookeeper-3.7.0/apache-zookeeper-3.7.0.tar.gz
+https://www.apache.org/dyn/closer.lua/zookeeper/zookeeper-3.7.0/apache-zookeeper-3.7.0-bin.tar.gz
 
 - configuration:
+create a new folder as logs/
 rename conf/zoo.cfg
-change dataDir
+change dataDir to point to logs/
 
 - run:
 start server
 ./bin/zkServer.sh start
+./bin/zkServer.sh status
 
 start client
+./bin/zkCli.sh
 
+- client command line - can type commands here
+help
+ls / => total znodes available
+create /parent "some parent data" => create parent znode
+create /parent/child "some child data" => create child znode
+ls /parent
+get /parent => info about parent znode
+delete /parent
+deleteall /parent
+create /election ""
 
+## Zookeeper threading model
+- application start code in the main method on main thread
+- when Zookeeper object is created, 2 additional threads are created:
+event thread
+IO thread
 
+# IO Thread
+- handles all the network communication with Zookeeper servers
+- handles Zookeeper requests and responses
+- responds to pings
+- session management
+- session timeouts
+- etc.
+
+# Event Thread
+- manages Zookeeper events
+  connection (KeeperState.SyncConnected)
+  disconnection (KeeperState.Disconnected)
+- custom znode Watchers and Triggers to subscribe to
+- Events are executed on Event Thread in order
