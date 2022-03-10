@@ -178,3 +178,5 @@ IO thread
   disconnection (KeeperState.Disconnected)
 - custom znode Watchers and Triggers to subscribe to
 - Events are executed on Event Thread in order
+
+## Code for LeaderElection
