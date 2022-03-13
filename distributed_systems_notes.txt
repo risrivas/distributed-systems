@@ -179,7 +179,7 @@ IO thread
 - custom znode Watchers and Triggers to subscribe to
 - Events are executed on Event Thread in order
 
-## Code for LeaderElection
+- demo code: LeaderElection
 
 ## Watchers and Triggers
 - we can register a watcher when we call the methods
@@ -188,10 +188,16 @@ getData() - get notified if a znode's data gets modified
 exists() - get notified if a znode gets deleted or created
 
 - watcher allows us to get a notifcation when a change happens
-- demo code : WatchersDemo
+- demo code: WatchersDemo
 
 - for reelection of leader, instead of all cluster nodes "watching" the znodes
-only the next cluster node watches the previous znode
+only the next cluster node watches the previous ephermal znode
 if the leader cluster node dies, its znode will send the deleted node event to the next cluster node
 and next cluster node will become the new leader
+
+- demo code: LeaderReleaction
+
+## Fault Tolerance and Horizontal Scalability are very important properties
+- Fault Tolerance: business can run 24X7 with no interruptions
+- Horizontal Scalability: can dynamically grow our business on demand
 
