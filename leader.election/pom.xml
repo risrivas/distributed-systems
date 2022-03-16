@@ -6,7 +6,12 @@
 
     <groupId>distributed.systems</groupId>
     <artifactId>leader.election</artifactId>
+    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>autohealer</module>
+        <module>flakyworker</module>
+    </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
