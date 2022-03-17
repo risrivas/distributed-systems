@@ -23,7 +23,6 @@ package exercise;/*
  */
 
 import org.apache.zookeeper.*;
-import org.apache.zookeeper.data.Stat;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +31,7 @@ import java.util.List;
 public class Autohealer implements Watcher {
 
     private static final String ZOOKEEPER_ADDRESS = "localhost:2181";
-    private static final int SESSION_TIMEOUT = 30000;
+    private static final int SESSION_TIMEOUT = 3000;
 
     // Parent Znode where each worker stores an ephemeral child to indicate it is alive
     private static final String AUTOHEALER_ZNODES_PATH = "/workers";
@@ -49,7 +48,7 @@ public class Autohealer implements Watcher {
         this.pathToProgram = pathToProgram;
     }
 
-    public void startWatchingWorkers() throws KeeperException, InterruptedException, IOException {
+    public void startWatchingWorkers() throws KeeperException, InterruptedException {
         if (zooKeeper.exists(AUTOHEALER_ZNODES_PATH, false) == null) {
             zooKeeper.create(AUTOHEALER_ZNODES_PATH, new byte[]{}, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
         }
@@ -86,40 +85,47 @@ public class Autohealer implements Watcher {
             /**
              * Add states code here to respond to the relevant events
              */
-            case NodeDeleted:
-                System.out.printf("%s was deleted%n", AUTOHEALER_ZNODES_PATH);
-                try {
-                    launchWorkersIfNecessary();
-                } catch (InterruptedException | KeeperException | IOException e) {
-                    e.printStackTrace();
-                }
+            case NodeChildrenChanged:
+                System.out.printf("%s children changed%n", AUTOHEALER_ZNODES_PATH);
+                launchWorkersIfNecessary();
                 break;
         }
     }
 
-    private void launchWorkersIfNecessary() throws InterruptedException, KeeperException, IOException {
+    private void launchWorkersIfNecessary() {
+        try {
+            List<String> children = zooKeeper.getChildren(AUTOHEALER_ZNODES_PATH, this);
+            System.out.println(String.format("Currently there are %d workers", children.size()));
+
+            if (children.size() < numberOfWorkers) {
+                startNewWorker();
+            }
+        } catch (InterruptedException | KeeperException | IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    private void launchWorkersIfNecessary1() {
         /**
          * Implement this method to watch and launch new workers if necessary
          */
-        final Stat stat = zooKeeper.exists(AUTOHEALER_ZNODES_PATH, this);
-        if (stat == null) {
-            return;
-        }
-
-        final List<String> children = zooKeeper.getChildren(AUTOHEALER_ZNODES_PATH, this);
-
-        final int totalWorkers = children.size();
-        System.out.printf("Total no of workers currently: %d%n", totalWorkers);
-
-        if (totalWorkers < numberOfWorkers) {
-            int newWorkersToCreate = numberOfWorkers - totalWorkers;
-            System.out.printf("Creating %d new workers%n", newWorkersToCreate);
-            for (int i = 0; i < newWorkersToCreate; i++) {
+        List<String> children;
+        try {
+            children = zooKeeper.getChildren(AUTOHEALER_ZNODES_PATH, this);
+            int totalWorkers = children.size();
+            System.out.printf("Total no of workers currently: %d%n", totalWorkers);
+            while (totalWorkers < numberOfWorkers) {
                 startNewWorker();
+                children = zooKeeper.getChildren(AUTOHEALER_ZNODES_PATH, this);
+                totalWorkers = children.size();
+                System.out.printf("Total no of workers after starting one: %d%n", totalWorkers);
             }
+            //System.out.printf("Latest no of workers: %d%n", zooKeeper.getChildren(AUTOHEALER_ZNODES_PATH, this).size());
+        } catch (KeeperException | IOException | InterruptedException e) {
+            e.printStackTrace();
+            System.exit(1);
         }
-
-        System.out.printf("Latest no of workers: %d%n", zooKeeper.getChildren(AUTOHEALER_ZNODES_PATH, this).size());
     }
 
     /**

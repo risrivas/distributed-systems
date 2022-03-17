@@ -209,4 +209,17 @@ and next cluster node will become the new leader
 
 java -jar target/autohealer-1.0-SNAPSHOT-jar-with-dependencies.jar 10 "../flakyworker/target/flaky.worker-1.0-SNAPSHOT-jar-with-dependencies.jar"
 java -jar .\target\autohealer-1.0-SNAPSHOT-jar-with-dependencies.jar 10 "..\flakyworker\target\flaky.worker-1.0-SNAPSHOT-jar-with-dependencies.jar"
-C:\Users\rishi\Downloads\Study\Udemy\Design Patterns\distributed-systems\flakyworker\target\flaky.worker-1.0-SNAPSHOT-jar-with-dependencies.jar
+C:\Users\rishi\Downloads\Study\Udemy\Design Patterns\distributed-systems\leader.election\flakyworker\target\flaky.worker-1.0-SNAPSHOT-jar-with-dependencies.jar
+
+
+## Service Discovery
+- nodes should know which other nodes are present in the cluster
+- use dynamic configuration tool like Chef or Puppet to distribute among the nodes
+- best to use service registry in Zookeeper
+- other techs: etcd, consul, Netflix Eureka, etc...
+
+## Service Registry with Zookeeper
+- each node will create an ephermal Znode with its address in it with permanent Znode /service_registry as ephermal Znode's parent
+- then any node can call getChildren() on /service_registry to get all ephermal Znodes
+- and use getData() method on ephermal Znode to get the address
+
