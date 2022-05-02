@@ -93,7 +93,9 @@ the nodes in a cluster are working on the same task and typically are running th
 - Apache Zookeeper - high performance distributed system coordination service
 
 
-## Apache Zookeeper
+###################
+# Apache Zookeeper
+###################
 - a high performance coordination service designed specifically for distributed systems
 - popular technology used by many companies and projects (Kafka, Hadoop, HBase, etc)
 - provides an abstraction layer for higher level distributed algorithms
@@ -115,10 +117,31 @@ Znodes can have children Znodes - like a directory
 persistent: persists between sessions
 ephermal: is deleted when the session ends
 
+- An Ephermal Znode is deleted automatically as soon as its creator process disconnects from zookeeper
+this can help to detect that a process dies or disconnected from the zookeeper service
+
+- a Persisten Znode stays within Zookeeper until it is explicitly deleted
+this can help to store data in between sessions
+
 
 ## Leader election algorithn
-- each Znode sends its election candidate to Zookeeper
+Step 1:
+- every node connects to Zookeeper and creates its Znode under Zookeeper's Znode = /election
+- zookeeper gives a unique number to each new Znode in the order of their addition
+Step 2:
+- each node will query the children of /election
+- it's guaranteed that node will receive all the children Znodes which were created "prior" to its own Znode
+Step 3:
+- if no children received, then the current node is the first one and becomes the leader
 - elected based on lower number priority or some other algorithm
+- if not the leader - it will follow the instructions from leader as the leader will already be elected
+
+summary:
+Each node in the cluster will try to create a znode with the lowest sequence number available as the znode's name
+When a node detects that its znode has the lowest sequence number, it becomes the leader
+When a node detects that its znode doesn't have the lowest sequence number, it becomes the follower
+Zookeeper guarantees a monotonically increasing, unique sequence number for each node that requests a sequence suffixed znode
+
 
 ## resources
 https://blog.twitter.com/engineering/en_us/topics/infrastructure/2018/zookeeper-at-twitter
@@ -129,6 +152,8 @@ https://zookeeper.apache.org/doc/r3.7.0/index.html
 - Zookeeper configuration and startup
 - Zookeeper command line client
 - development done locally on a single computer but deploy to production cluster
+- Zookeeper client makes Znodes appear like files on our computer
+however, there are no Znodes stored in our file system - it's a representation of the zookeeper in-memory data model
 
 - download:
 https://zookeeper.apache.org/releases.html
@@ -159,8 +184,9 @@ delete /parent
 deleteall /parent
 create /election ""
 
+
 ## Zookeeper threading model
-- application start code in the main method on main thread
+- application start code in the main method is executed on the main thread
 - when Zookeeper object is created, 2 additional threads are created:
 event thread
 IO thread
@@ -182,6 +208,15 @@ IO thread
 
 - demo code: LeaderElection
 
+- when the Zookeeper client connects to Zookeeper server - as its all asynchronous and event driven
+server will respond the events in the separate event threads
+thus client needs to implement Watcher and use event handlers to handle WatchedEvent in overridden process() method
+- for successful connection - server sends event of type None and state as Event.KeeperState.SyncConnected
+- server also keeps on sending ping to check if the client is alive and connected
+- client maintains a background IO thread that has to send and respond to pings to and from server
+- if the server is down after successful connection, the event state will change and then client can close the connection
+
+
 ## Watchers and Triggers
 - we can register a watcher when we call the methods
 getChildren() - get notified when the list of a znode's children changes
@@ -196,7 +231,7 @@ only the next cluster node watches the previous ephermal znode
 if the leader cluster node dies, its znode will send the deleted node event to the next cluster node
 and next cluster node will become the new leader
 
-- demo code: LeaderReleaction
+- demo code: LeaderReelection
 
 ## Fault Tolerance and Horizontal Scalability are very important properties
 - Fault Tolerance: business can run 24X7 with no interruptions
@@ -222,4 +257,16 @@ C:\Users\rishi\Downloads\Study\Udemy\Design Patterns\distributed-systems\leader.
 - each node will create an ephermal Znode with its address in it with permanent Znode /service_registry as ephermal Znode's parent
 - then any node can call getChildren() on /service_registry to get all ephermal Znodes
 - and use getData() method on ephermal Znode to get the address
+
+## pending - demo code
+
+
+########################
+# Network Communication
+########################
+- in the same java process, all the threads communicate with each other using same shared memory
+- in the distributed systems, communication between nodes is different as there is no shared memory
+
+
+
 
