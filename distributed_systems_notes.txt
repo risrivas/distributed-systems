@@ -216,6 +216,11 @@ thus client needs to implement Watcher and use event handlers to handle WatchedE
 - client maintains a background IO thread that has to send and respond to pings to and from server
 - if the server is down after successful connection, the event state will change and then client can close the connection
 
+- to package the code, need maven plugin: maven-assembly-plugin
+- then run: mvn clean package
+- execute 4 nodes in 4 git bash
+java -jar target/leader.election-1.0-SNAPSHOT-jar-with-dependencies.jar
+
 
 ## Watchers and Triggers
 - we can register a watcher when we call the methods
@@ -226,6 +231,8 @@ exists() - get notified if a znode gets deleted or created
 - watcher allows us to get a notifcation when a change happens
 - demo code: WatchersDemo
 
+
+## Leader Re-election
 - for reelection of leader, instead of all cluster nodes "watching" the znodes
 only the next cluster node watches the previous ephermal znode
 if the leader cluster node dies, its znode will send the deleted node event to the next cluster node
