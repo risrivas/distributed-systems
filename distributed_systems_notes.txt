@@ -1,6 +1,6 @@
-###############
-# Introduction
-###############
+###########################
+# Chapter 1 - Introduction
+###########################
 - where can we find distributed systems
 watch a movie on demand
 shop online
@@ -49,9 +49,9 @@ Memory
 - sharing state and working toward a common goal => no common goal - not a distributed system
 
 
-##########################################################
-# Cluster Coordination Service and Distributed Algorithms
-##########################################################
+######################################################################
+# Chapter 2 - Cluster Coordination Service and Distributed Algorithms
+######################################################################
 
 ## Introduction to Cluster Coordination & Theory of Leader Election
 
@@ -120,7 +120,7 @@ ephermal: is deleted when the session ends
 - An Ephermal Znode is deleted automatically as soon as its creator process disconnects from zookeeper
 this can help to detect that a process dies or disconnected from the zookeeper service
 
-- a Persisten Znode stays within Zookeeper until it is explicitly deleted
+- a Persistent Znode stays within Zookeeper until it is explicitly deleted
 this can help to store data in between sessions
 
 
@@ -254,6 +254,10 @@ java -jar .\target\autohealer-1.0-SNAPSHOT-jar-with-dependencies.jar 10 "..\flak
 C:\Users\rishi\Downloads\Study\Udemy\Design Patterns\distributed-systems\leader.election\flakyworker\target\flaky.worker-1.0-SNAPSHOT-jar-with-dependencies.jar
 
 
+##############################################################
+# Chapter 3 - Cluster Management, Registration and Discovery
+##############################################################
+
 ## Service Discovery
 - nodes should know which other nodes are present in the cluster
 - use dynamic configuration tool like Chef or Puppet to distribute among the nodes
@@ -268,11 +272,158 @@ C:\Users\rishi\Downloads\Study\Udemy\Design Patterns\distributed-systems\leader.
 ## pending - demo code
 
 
-########################
-# Network Communication
-########################
+#####################################
+# Chapter 4 - Network Communication
+#####################################
+
+## Introduction to Network Communication
+- TCP/IP Model
+- Full example of a request traveling through the network
+
+# Multithreaded vs Distributed systems
 - in the same java process, all the threads communicate with each other using same shared memory
 - in the distributed systems, communication between nodes is different as there is no shared memory
+
+# TCP/IP Network Model
+
+Machine 1                                           Machine 2
+----------                                         -----------
+Application <---> HTTP, FTP, SMTP               <--->  Application
+Transport   <---> TCP, UDP                      <--->  Transport
+Internet    <---> IP, ICMP                      <--->  Internet
+Data Link   <---> Ethernet, 802.11, ARP, RAPR   <--->  Data Link
+
+- each layer talks to the same layer on other machine to transfer data
+
+
+# Layer 1 - Data Link
+- Machine 1 <--> Ethernet / Router <--> Machine 2 (within the same LAN network)
+- physical delivery of data over a single link
+- In charge of:
+  encapsulation of the data
+  flow control
+  error detection and correction
+  etc..
+
+- Ethernet protocol
+works on MAC addresses
+MAC address 1 of first machine -> Link 1 to router's MAC address 2 -> Link 2 to MAC address 3 of the second machine
+
+
+# Layer 2 - Internet
+- works on IP address
+- Source IP address -> Router 1 IP address -> Router 2 over internet -> several hops to other routers -> Destination Router IP address -> Destination IP address
+- it doesn't know which process on the destination machine to deliver the data
+- it's only job is to connect from source machine IP address to destination machine IP address
+
+
+# Layer 3 - Transport
+- delivers the data to actual process running on destination machine
+- destination has dedicated PORT where the process is listening (chosen before)
+- source port is generated at sending time and it can be random
+- OS knows which process to deliver the data to based on PORT
+- TCP and UDP are the most common protocol
+
+
+UDP
+- Connectionless
+- best effort - unreliable
+- messages can be
+  lost
+  duplicated
+  reordered
+- based on a unit called Datagram which is limited in size
+- preferred when the speed and simplicity is more important than reliability
+- use case:
+sending debug information to a distributed logging service
+real-time data stream service such as video or audio or market data
+online gaming
+broadcasting
+
+
+TCP
+- reliable - guarantees data delivery as sent, without any losses
+- connection between 2 points - formed by source IP + port (unique) + destination IP + listening port
+  needs to be created before data is sent
+  shut down in the end
+- works as a streaming interface
+- more popular protocol in distributed systems because of the reliability
+- use case:
+build a HTTP web server: IP + port 80
+now any number of clients can connect using TCP -> each having dedicated channel (TCP socket connection) to the web server
+
+- TCP is based on stream of bytes, however doesn't know which bytes corresponds to which message / command etc
+- thus parsing messages / commands from stream of bytes is very hard
+- thats why we have final layer - Application layer
+
+
+# Layer 4 - Application
+- several protocols which can help parse the stream of bytes received
+- ex:
+FTP (File Transport Protocol) - transfering files through the web
+SMTP (Simple Mail Transfer Protocol) - sending and receiving mails
+DNS (DOmain Name System) - Translating host names into IP addresses
+HTTP (Hypertext Transport Protocol) - Transmitting Hypermedia documents, video, sound, images
+
+
+
+## Full example of a request traveling through the network
+Client <-> Router <-> Server
+
+1. Application layer - client sends a HTTP GET request
+GET HTTP/1.1
+Host: 24.28.18.17:8080
+Content-Length: 20
+...
+
+2. Transport layer - adds destination port and source port
+Dest Port: 8080
+Src Port: 12345
+
+3. Internet layer - adds src and desitnation IP addresses
+Dest IP: 24.28.18.17
+Src IP: 23.241.168.123 (client's machine IP)
+
+4. Data Link layer - adds src and destination MAC addresses and also Error Connection Data
+Dest MAC: 18:FE:93:9A:1C:76
+Src MAC: A5:DE:43:AC:11:63 (client's machine MAC)
+
+
+- the above Frame created by client is send to the router
+- router
+  removes Ethernet protocol header
+  looks at the destination IP address
+  looks at the routing table and figures out which n/w it should be sent
+  adds a new Ethernet header: with router's MAC address as source MAC address
+  sends the Frame to the server
+
+- Server side: the Frame is peeled off for data in the reverse order (data link layer first)
+
+- Service registry: http://27.15.97.15:8081
+27.15.97.15 - IP address in Internet layer
+8081 - port in Transport layer
+http - HTTP protocol in Application layer
+
+- Data packaging and Serilaization is done to send efficiently between the nodes in the cluster
+
+
+
+########
+# HTTP
+########
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
