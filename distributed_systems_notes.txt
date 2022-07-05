@@ -142,7 +142,6 @@ When a node detects that its znode has the lowest sequence number, it becomes th
 When a node detects that its znode doesn't have the lowest sequence number, it becomes the follower
 Zookeeper guarantees a monotonically increasing, unique sequence number for each node that requests a sequence suffixed znode
 
-
 ## resources
 https://blog.twitter.com/engineering/en_us/topics/infrastructure/2018/zookeeper-at-twitter
 https://zookeeper.apache.org/doc/r3.7.0/index.html
