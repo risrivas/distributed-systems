@@ -412,6 +412,82 @@ http - HTTP protocol in Application layer
 # HTTP
 ########
 
+# HTTP Fundamentals
+- used for communication between client and server at Application layer
+- HTTP Request Structure has 5 parts:
+Method: GET / POST / PUT / DELETE etc
+Relative Path: /path
+Protocol version: HTTP/1.1
+HTTP Headers: Content-Length, Content-Type, etc
+Message Body
+
+- HTTP GET
+safe - only retrieval action
+idempotent - whether use it N times or once will result in same
+does NOT contain message body
+
+- HTTP GET use cases
+heartbeat - can be used to check health of nodes
+distributed data retrieval - meaning can retrieve data from microservices without knowling anything about underlying data base
+
+- HTTP POST
+contains message body and expects data returned from server
+
+- Relative path
+http://123..../users?userId=123&month=03
+
+/users is relative path
+everything after ? is Query String
+
+- Protocol version
+HTTP/1.1 or HTTP/2
+
+# HTTP/1.1
+creates a dedicated connection between client and server
+one 1 request can be sent via this connection, 2nd request has to wait until the first response is received back to the client
+if creating new connection for every request - this can be very expensive operation
+
+no of outgoing connections as a client is limited by:
+- no of ports
+- operating system
+
+# HTTP/2
+- breaks the same single connection into multiple streams - thus can contain multiple request / responses in the same connection
+
+# HTTP Headers
+- Key value pairs
+- Multiple Values for the same key can be separated by ;
+- Some headers are used only in requests or responses or both
+- can pass custom headers
+- allow the recipients to take actions before reading the message body, like
+memory allocation
+skipping / forwarding (proxying)
+
+- In HTTP/1.1, headers can be inspected by tools like Wireshark
+- In HTTP/2, headers are compressed, thus saves on payload size and harder to inspect/debug
+
+# HTTP Response Structure has 5 parts:
+Protocol version: HTTP/1.1
+Status code: 200 / 400 etc
+Status message: OK
+HTTP Headers: Content-Length, Content-Type, etc
+Message Body
+
+- Status code
+1xx = informational response
+2xx = success
+3xx = Redirection
+4xx = Client Errors
+5xx = Server Errors
+
+
+
+
+
+
+
+
+
 
 
 
